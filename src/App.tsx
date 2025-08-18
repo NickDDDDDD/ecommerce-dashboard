@@ -1,9 +1,9 @@
-import ProductManagementPage from "./pages/ProductManagementPage";
+import DashboardLayout from "./layout/DashboardLayout";
 
 function App() {
   return (
     <>
-      <ProductManagementPage />
+      <DashboardLayout />
     </>
   );
 }
