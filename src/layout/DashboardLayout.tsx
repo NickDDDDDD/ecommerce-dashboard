@@ -5,15 +5,15 @@ import NavItem from "../components/NavItem";
 const DashboardLayout = () => {
   return (
     <main className="grid h-full w-full grid-cols-24 grid-rows-[auto_1fr]">
-      <header className="col-span-24 flex items-center justify-between bg-red-200 px-4 py-4">
+      <header className="col-span-24 flex items-center justify-between bg-gray-100 px-4 py-4">
         <Logo />
         <Avatar />
       </header>
-      <nav className="col-span-3 bg-yellow-200 p-4">
+      <nav className="col-span-3 p-4">
+        <div className="mb-2 border-b-1 border-gray-200 pb-2">
+          <NavItem to="/">Dashboard</NavItem>
+        </div>{" "}
         <ul>
-          <li>
-            <NavItem to="/">Dashboard</NavItem>
-          </li>
           <li>
             <NavItem to="/products">Products</NavItem>
           </li>
@@ -22,7 +22,7 @@ const DashboardLayout = () => {
           </li>
         </ul>
       </nav>
-      <section className="col-span-21 bg-green-200 p-4">
+      <section className="col-span-21 p-4">
         <Outlet />
       </section>
     </main>
