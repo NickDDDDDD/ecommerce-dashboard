@@ -10,7 +10,7 @@ type SortDir = "asc" | "desc";
 
 const PageSize = 10;
 
-  };
+export default function ProductsPage() {
   const [params, setParams] = useSearchParams();
 
   // 1) URL 参数源
