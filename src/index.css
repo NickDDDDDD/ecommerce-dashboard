@@ -6,4 +6,8 @@
   #root {
     @apply m-0 h-full w-full;
   }
+
+  button {
+    @apply cursor-pointer transition-transform duration-100 active:scale-95;
+  }
 }

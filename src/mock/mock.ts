@@ -1,6 +1,7 @@
 // src/mocks/index.ts
 import Mock from "mockjs";
 import type { Product } from "../types/product";
+import type { ProductsResp } from "../types/productsResp";
 
 const list: Product[] = Mock.mock({
   "list|50": [
@@ -10,7 +11,6 @@ const list: Product[] = Mock.mock({
       price: "@float(10, 2000, 2, 2)",
       stock: "@integer(0, 1000)",
       "status|1": ["draft", "active", "archived"],
-      // 随机 ISO 时间（过去 6 个月内）
       publishedAt: () => {
         const now = Date.now();
         const past = now - 180 * 24 * 60 * 60 * 1000;
@@ -21,7 +21,31 @@ const list: Product[] = Mock.mock({
   ],
 }).list;
 
-// ✅ 用正则匹配，命中 /api/products（带前导斜杠）
-Mock.mock(/\/api\/products$/, "get", () => list);
+Mock.mock(
+  /\/api\/products(\?.*)?$/,
+  "get",
+  (options: { url: string }): ProductsResp => {
+    const url = new URL(options.url, window.location.origin);
+    const sp = url.searchParams;
+
+    const page = Math.max(1, Number(sp.get("page") || 1));
+    const pageSize = Math.max(1, Number(sp.get("pageSize") || 10));
+
+    const total = list.length;
+    const totalPages = Math.ceil(total / pageSize);
+    const safePage = Math.min(page, totalPages);
+
+    const start = (safePage - 1) * pageSize;
+    const items = list.slice(start, start + pageSize);
+
+    return {
+      items,
+      page: safePage,
+      pageSize,
+      total,
+      totalPages,
+    };
+  },
+);
 
 Mock.setup({ timeout: "200-600" });

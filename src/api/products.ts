@@ -1,7 +1,13 @@
 import http from "../lib/http";
-import { type Product } from "../types/product";
+import { type ProductsResp } from "../types/productsResp";
 
-export async function listProducts() {
-  const { data } = await http.get<Product[]>("/products");
+export async function listProducts(params: {
+  q?: string;
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortDir?: string;
+}) {
+  const { data } = await http.get<ProductsResp>("/products", { params });
   return data;
 }
