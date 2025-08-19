@@ -1,4 +1,20 @@
+import { listProducts } from "../api/products";
+import { useState, useEffect } from "react";
+import { type Product } from "../types/product";
+
 const ProductsPage = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+
+  const fetchProducts = async () => {
+    const products = await listProducts();
+    console.log("products: ", products);
+
+    setProducts(products);
+  };
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
   return (
     <section className="flex h-full w-full flex-col gap-4">
       <div className="flex w-full gap-2">
