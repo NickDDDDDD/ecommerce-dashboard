@@ -26,7 +26,7 @@ const ProductItem = ({ product, onUpdated }: ProductItemProps) => {
       <div>${product.price}</div>
       <div>{product.stock ?? "-"}</div>
       <div>{formatPublishedAt(product.publishedAt)}</div>
-      <div className={twMerge(statusStyle, "w-fit px-2 py-1 text-sm")}>
+      <div className={twMerge(statusStyle, "w-fit text-sm")}>
         {statusLabelMap[product.status]}
       </div>
       <div className="absolute right-4 hidden items-center gap-2 group-hover:flex">

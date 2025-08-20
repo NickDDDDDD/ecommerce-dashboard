@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import type { ProductsResp } from "../types/productsResp";
-import { getPageWindow } from "../utils/pagination";
-import { twMerge } from "tailwind-merge";
 
 import { getProducts } from "../api/products";
+import Pagination from "../components/Pagination";
 
 import ProductItem from "../components/ProductItem";
 import AddProductModal from "../components/AddProductModal";
@@ -34,8 +33,6 @@ export default function ProductsPage() {
   // total pages
 
   const totalPages = data?.totalPages ?? 1;
-
-  const { pages, hasPrevGap, hasNextGap } = getPageWindow(page, totalPages, 5);
 
   useEffect(() => setInput(q), [q]);
 
@@ -110,7 +107,7 @@ export default function ProductsPage() {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Search products..."
+          placeholder="搜索商品名..."
           className="flex-1 rounded-md border border-gray-300 px-2 py-1"
           aria-label="Search products"
         />
@@ -180,62 +177,7 @@ export default function ProductsPage() {
         </div>
 
         {/* pagination */}
-        <div className="flex h-14 items-center justify-center bg-gray-100 px-3 py-2 text-sm">
-          <div className="flex items-center gap-1">
-            <button
-              className="rounded px-2 py-1 hover:bg-gray-200"
-              onClick={() => goPage(page - 1)}
-              disabled={page <= 1}
-            >
-              上一页
-            </button>
-
-            {hasPrevGap && (
-              <>
-                <button
-                  className="rounded px-2 py-1 hover:bg-gray-200"
-                  onClick={() => goPage(1)}
-                >
-                  1
-                </button>
-                <span className="px-1 text-gray-500">…</span>
-              </>
-            )}
-
-            {pages.map((p) => (
-              <button
-                key={p}
-                onClick={() => goPage(p)}
-                className={twMerge(
-                  "rounded px-2 py-1 hover:bg-gray-200",
-                  p === page && "bg-blue-600 text-white hover:bg-blue-600",
-                )}
-              >
-                {p}
-              </button>
-            ))}
-
-            {hasNextGap && (
-              <>
-                <span className="px-1 text-gray-500">…</span>
-                <button
-                  className="rounded px-2 py-1 hover:bg-gray-200"
-                  onClick={() => goPage(totalPages)}
-                >
-                  {totalPages}
-                </button>
-              </>
-            )}
-
-            <button
-              className="rounded px-2 py-1 hover:bg-gray-200"
-              onClick={() => goPage(page + 1)}
-              disabled={page >= totalPages}
-            >
-              下一页
-            </button>
-          </div>
-        </div>
+        <Pagination page={page} totalPages={totalPages} goPage={goPage} />
       </div>
     </section>
   );
