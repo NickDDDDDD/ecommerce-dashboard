@@ -22,7 +22,7 @@ const list: Product[] = Mock.mock({
   ],
 }).list;
 
-// mock getProducts API
+// GET /products/:params
 Mock.mock(
   /\/api\/products(\?.*)?$/,
   "get",
@@ -50,6 +50,7 @@ Mock.mock(
   },
 );
 
+// POST /products/:ProductCreate
 Mock.mock("/api/products", "post", (options: { body: string }): Product => {
   const payload = JSON.parse(options.body) as ProductCreate;
 
@@ -65,5 +66,41 @@ Mock.mock("/api/products", "post", (options: { body: string }): Product => {
   list.unshift(newProduct);
   return newProduct;
 });
+
+// PUT /products/:id
+Mock.mock(
+  /\/api\/products\/([^/]+)$/,
+  "put",
+  (options: { url: string; body: string }): Product => {
+    const m = options.url.match(/\/api\/products\/([^/]+)$/);
+    const id = m?.[1];
+    if (!id) {
+      //404
+      return list[0];
+    }
+
+    const patch = JSON.parse(options.body) as Partial<
+      Pick<Product, "name" | "price" | "stock" | "status">
+    >;
+
+    const idx = list.findIndex((p) => p.id === id);
+    if (idx === -1) {
+      //404
+      return list[0];
+    }
+
+    const prev = list[idx];
+    const next: Product = { ...prev, ...patch };
+
+    if (patch.status === "active" && !prev.publishedAt) {
+      next.publishedAt = new Date().toISOString();
+    } else if (patch.status === "draft") {
+      next.publishedAt = null;
+    }
+
+    list[idx] = next;
+    return next;
+  },
+);
 
 Mock.setup({ timeout: "200-600" });

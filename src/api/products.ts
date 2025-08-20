@@ -17,3 +17,11 @@ export async function createProduct(product: ProductCreate) {
   const { data } = await http.post<Product>("/products", product);
   return data;
 }
+
+export async function updateProduct(
+  id: string,
+  patch: Partial<Pick<Product, "name" | "price" | "stock" | "status">>,
+) {
+  const { data } = await http.put<Product>(`/products/${id}`, patch);
+  return data;
+}

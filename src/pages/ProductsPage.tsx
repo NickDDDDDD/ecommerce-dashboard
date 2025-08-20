@@ -162,7 +162,10 @@ export default function ProductsPage() {
             <ul className="flex h-full flex-col divide-y divide-gray-200">
               {data.items.map((product) => (
                 <li key={product.id} className="flex-1">
-                  <ProductItem product={product} />
+                  <ProductItem
+                    product={product}
+                    onUpdated={() => setRefresh((prev) => prev + 1)}
+                  />
                 </li>
               ))}
             </ul>

@@ -2,19 +2,52 @@ import Modal from "./Modal";
 import { useState } from "react";
 import type { Product } from "../types/product";
 import { formatPublishedAt } from "../utils/date";
+import { updateProduct } from "../api/products";
 
 type EditProductModalProps = {
   setModalOpen: (open: boolean) => void;
+  onUpdated: () => void;
+
   product: Product;
 };
 
-const EditProductModal = ({ setModalOpen, product }: EditProductModalProps) => {
+const EditProductModal = ({
+  setModalOpen,
+  product,
+  onUpdated,
+}: EditProductModalProps) => {
   const [productData, setProductData] = useState<Product>({
     ...product,
   });
+
+  const [submitting, setSubmitting] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  const handleSave = async () => {
+    setSubmitting(true);
+    setErr(null);
+
+    try {
+      await updateProduct(productData.id, productData);
+      onUpdated();
+      setModalOpen(false);
+    } catch (error) {
+      setErr("Failed to update product");
+      console.error(error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <Modal setModalOpen={setModalOpen}>
       <form className="flex w-[50vw] flex-col gap-8 rounded-md bg-gray-100 p-8 text-xl shadow-md">
+        {err && (
+          <div className="rounded bg-red-50 p-2 text-sm text-red-600">
+            {err}
+          </div>
+        )}
+
         <div className="flex flex-col gap-2">
           <label htmlFor="name">Product Name</label>
           <input
@@ -100,16 +133,19 @@ const EditProductModal = ({ setModalOpen, product }: EditProductModalProps) => {
             onClick={(e) => {
               e.preventDefault();
               // Handle product submission logic here
+              handleSave();
               console.log("Product submitted:", productData);
               setModalOpen(false);
             }}
+            disabled={submitting}
           >
-            Save
+            {submitting ? "Saving..." : "Save"}
           </button>
           <button
             type="button"
             className="flex-1 rounded-md bg-gray-200 p-2 hover:bg-gray-300"
             onClick={() => setModalOpen(false)}
+            disabled={submitting}
           >
             Cancel
           </button>

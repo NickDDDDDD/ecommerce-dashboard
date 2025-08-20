@@ -3,7 +3,13 @@ import { twMerge } from "tailwind-merge";
 import { useState } from "react";
 import EditProductModal from "./EditProductModal";
 import { formatPublishedAt } from "../utils/date";
-const ProductItem = ({ product }: { product: Product }) => {
+
+type ProductItemProps = {
+  product: Product;
+  onUpdated: () => void; // Optional callback for when the product is updated
+};
+
+const ProductItem = ({ product, onUpdated }: ProductItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const statusStyle = {
@@ -36,7 +42,11 @@ const ProductItem = ({ product }: { product: Product }) => {
       </div>
 
       {isEditing && (
-        <EditProductModal setModalOpen={setIsEditing} product={product} />
+        <EditProductModal
+          setModalOpen={setIsEditing}
+          product={product}
+          onUpdated={onUpdated}
+        />
       )}
     </div>
   );
