@@ -15,10 +15,10 @@ const DashboardLayout = () => {
         </div>{" "}
         <ul>
           <li>
-            <NavItem to="/products">Products</NavItem>
+            <NavItem to="/products">商品管理</NavItem>
           </li>
           <li>
-            <NavItem to="/orders">Orders</NavItem>
+            <NavItem to="/orders">订单管理</NavItem>
           </li>
         </ul>
       </nav>

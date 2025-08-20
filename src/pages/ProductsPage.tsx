@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import type { ProductsResp } from "../types/productsResp";
+import { getPageWindow } from "../utils/pagination";
+import { twMerge } from "tailwind-merge";
 
 import { getProducts } from "../api/products";
 
@@ -28,6 +30,12 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<unknown>(null);
   const [modalOpen, setModalOpen] = useState(false);
+
+  // total pages
+
+  const totalPages = data?.totalPages ?? 1;
+
+  const { pages, hasPrevGap, hasNextGap } = getPageWindow(page, totalPages, 5);
 
   useEffect(() => setInput(q), [q]);
 
@@ -94,10 +102,6 @@ export default function ProductsPage() {
     setParams(next, { replace: true });
   };
 
-  // total pages
-
-  const totalPages = data?.totalPages ?? 1;
-
   return (
     <section className="flex h-full w-full flex-col gap-4">
       {/* search bar + add product button */}
@@ -111,10 +115,10 @@ export default function ProductsPage() {
           aria-label="Search products"
         />
         <button
-          className="rounded-md bg-green-700 px-4 py-1 text-white"
+          className="rounded-md bg-green-700 px-4 py-1 text-sm text-white"
           onClick={() => setModalOpen(true)}
         >
-          Add product
+          添加商品
         </button>
       </div>
 
@@ -129,25 +133,25 @@ export default function ProductsPage() {
         {/* table header */}
         <div className="h-14 bg-gray-100">
           <div className="grid h-full grid-cols-6 items-center px-4 text-sm font-medium text-gray-700">
-            <div>ID</div>
-            <div>Name</div>
+            <div>商品ID</div>
+            <div>商品名</div>
             <button
               onClick={() => onSort("price")}
               className="flex items-center gap-1 text-left hover:underline"
             >
-              Price
+              价格
               {sortBy === "price" ? <span>({sortDir})</span> : null}
             </button>
             <button
               onClick={() => onSort("stock")}
               className="flex items-center gap-1 text-left hover:underline"
             >
-              Stock
+              库存
               {sortBy === "stock" ? <span>({sortDir})</span> : null}
             </button>
-            <div>Published</div>
+            <div>发布时间</div>
 
-            <div>Status</div>
+            <div>状态</div>
           </div>
         </div>
 
@@ -176,24 +180,59 @@ export default function ProductsPage() {
         </div>
 
         {/* pagination */}
-        <div className="flex h-14 items-center justify-between border-t px-3 py-2 text-sm">
-          <div className="text-gray-600">
-            Page {data?.page ?? page} / {totalPages}
-          </div>
-          <div className="flex items-center gap-2">
+        <div className="flex h-14 items-center justify-center bg-gray-100 px-3 py-2 text-sm">
+          <div className="flex items-center gap-1">
             <button
-              className="rounded border px-2 py-1 disabled:opacity-50"
+              className="rounded px-2 py-1 hover:bg-gray-200"
               onClick={() => goPage(page - 1)}
               disabled={page <= 1}
             >
-              Prev
+              上一页
             </button>
+
+            {hasPrevGap && (
+              <>
+                <button
+                  className="rounded px-2 py-1 hover:bg-gray-200"
+                  onClick={() => goPage(1)}
+                >
+                  1
+                </button>
+                <span className="px-1 text-gray-500">…</span>
+              </>
+            )}
+
+            {pages.map((p) => (
+              <button
+                key={p}
+                onClick={() => goPage(p)}
+                className={twMerge(
+                  "rounded px-2 py-1 hover:bg-gray-200",
+                  p === page && "bg-blue-600 text-white hover:bg-blue-600",
+                )}
+              >
+                {p}
+              </button>
+            ))}
+
+            {hasNextGap && (
+              <>
+                <span className="px-1 text-gray-500">…</span>
+                <button
+                  className="rounded px-2 py-1 hover:bg-gray-200"
+                  onClick={() => goPage(totalPages)}
+                >
+                  {totalPages}
+                </button>
+              </>
+            )}
+
             <button
-              className="rounded border px-2 py-1 disabled:opacity-50"
+              className="rounded px-2 py-1 hover:bg-gray-200"
               onClick={() => goPage(page + 1)}
               disabled={page >= totalPages}
             >
-              Next
+              下一页
             </button>
           </div>
         </div>

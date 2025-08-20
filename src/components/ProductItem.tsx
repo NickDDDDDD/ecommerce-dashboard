@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { useState } from "react";
 import EditProductModal from "./EditProductModal";
 import { formatPublishedAt } from "../utils/date";
+import { statusLabelMap } from "../utils/statusMap";
 
 type ProductItemProps = {
   product: Product;
@@ -13,9 +14,9 @@ const ProductItem = ({ product, onUpdated }: ProductItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const statusStyle = {
-    draft: "bg-gray-500",
-    active: "bg-green-600",
-    archived: "bg-red-600",
+    draft: "text-gray-600",
+    active: "text-green-600",
+    archived: "text-red-600",
   }[product.status];
 
   return (
@@ -25,20 +26,15 @@ const ProductItem = ({ product, onUpdated }: ProductItemProps) => {
       <div>${product.price}</div>
       <div>{product.stock ?? "-"}</div>
       <div>{formatPublishedAt(product.publishedAt)}</div>
-      <div
-        className={twMerge(
-          statusStyle,
-          "w-fit rounded-md px-2 py-1 text-xs font-semibold text-white",
-        )}
-      >
-        {product.status ?? "-"}
+      <div className={twMerge(statusStyle, "w-fit px-2 py-1 text-sm")}>
+        {statusLabelMap[product.status]}
       </div>
       <div className="absolute right-4 hidden items-center gap-2 group-hover:flex">
         <button
-          className="rounded-md bg-gray-500 px-4 py-1 text-white"
+          className="rounded-md bg-gray-300 px-4 py-1 text-sm"
           onClick={() => setIsEditing(true)}
         >
-          Edit
+          编辑
         </button>
       </div>
 

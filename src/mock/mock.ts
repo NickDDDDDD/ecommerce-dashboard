@@ -5,7 +5,7 @@ import type { ProductCreate } from "../types/productCreate";
 import type { ProductsResp } from "../types/productsResp";
 
 const list: Product[] = Mock.mock({
-  "list|50": [
+  "list|200": [
     {
       id: "@id(6,6)",
       name: "@ctitle(5, 10)",
