@@ -1,22 +1,30 @@
 import Modal from "./Modal";
 import { useState } from "react";
+import type { Product } from "../types/product";
+import { type ProductCreate } from "../types/productCreate";
+import { createProduct } from "../api/products";
 
 type AddProductModalProps = {
   setModalOpen: (open: boolean) => void;
+  onCreated: () => void;
 };
 
-type ProductInfo = {
-  name: string;
-  price: number;
-  stock: number;
-};
-
-const AddProductModal = ({ setModalOpen }: AddProductModalProps) => {
-  const [productData, setProductData] = useState<ProductInfo>({
+const AddProductModal = ({ setModalOpen, onCreated }: AddProductModalProps) => {
+  const [productData, setProductData] = useState<ProductCreate>({
     name: "",
     price: 0,
     stock: 0,
   });
+
+  const handleCreateProduct = async (productData: ProductCreate) => {
+    try {
+      const newProduct: Product = await createProduct(productData);
+      console.log("Product created successfully:", newProduct);
+      onCreated();
+    } catch (error) {
+      console.log("Error creating product:", error);
+    }
+  };
   return (
     <Modal setModalOpen={setModalOpen}>
       <form className="flex w-[50vw] flex-col gap-8 rounded-md bg-gray-100 p-8 text-xl shadow-md">
@@ -75,7 +83,7 @@ const AddProductModal = ({ setModalOpen }: AddProductModalProps) => {
             onClick={(e) => {
               e.preventDefault();
               // Handle product submission logic here
-              console.log("Product submitted:", productData);
+              handleCreateProduct(productData);
               setModalOpen(false);
             }}
           >

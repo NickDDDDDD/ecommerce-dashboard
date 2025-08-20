@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import type { ProductsResp } from "../types/productsResp";
-import { listProducts } from "../api/products";
+
+import { getProducts } from "../api/products";
+
 import ProductItem from "../components/ProductItem";
-import ProductModal from "../components/AddProductModal";
+import AddProductModal from "../components/AddProductModal";
 
 type SortField = "price" | "stock";
 type SortDir = "asc" | "desc";
@@ -12,6 +14,7 @@ const PageSize = 10;
 
 export default function ProductsPage() {
   const [params, setParams] = useSearchParams();
+  const [refresh, setRefresh] = useState(0);
 
   // url params
   const q = params.get("q") ?? "";
@@ -35,7 +38,7 @@ export default function ProductsPage() {
       try {
         setLoading(true);
         setErr(null);
-        const resp = await listProducts({
+        const resp = await getProducts({
           q: q || undefined,
           page,
           pageSize: PageSize,
@@ -52,7 +55,7 @@ export default function ProductsPage() {
       }
     })();
     return () => ctrl.abort();
-  }, [q, page, sortBy, sortDir]);
+  }, [q, page, sortBy, sortDir, refresh]);
 
   const timerRef = useRef<number | null>(null);
   useEffect(() => {
@@ -91,11 +94,13 @@ export default function ProductsPage() {
     setParams(next, { replace: true });
   };
 
+  // total pages
+
   const totalPages = data?.totalPages ?? 1;
 
   return (
     <section className="flex h-full w-full flex-col gap-4">
-      {/* search bar */}
+      {/* search bar + add product button */}
       <div className="flex w-full gap-2">
         <input
           type="text"
@@ -113,7 +118,12 @@ export default function ProductsPage() {
         </button>
       </div>
 
-      {modalOpen && <ProductModal setModalOpen={setModalOpen} />}
+      {modalOpen && (
+        <AddProductModal
+          setModalOpen={setModalOpen}
+          onCreated={() => setRefresh((prev) => prev + 1)}
+        />
+      )}
       {/* table */}
       <div className="flex flex-1 flex-col overflow-hidden rounded-md border border-gray-300 shadow-2xs">
         {/* table header */}

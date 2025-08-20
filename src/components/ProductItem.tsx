@@ -2,15 +2,9 @@ import { type Product } from "../types/product";
 import { twMerge } from "tailwind-merge";
 import { useState } from "react";
 import EditProductModal from "./EditProductModal";
+import { formatPublishedAt } from "../utils/date";
 const ProductItem = ({ product }: { product: Product }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const formatedDate = new Date(product.publishedAt).toLocaleString("zh-CN", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 
   const statusStyle = {
     draft: "bg-gray-500",
@@ -23,7 +17,7 @@ const ProductItem = ({ product }: { product: Product }) => {
       <div className="col-span-2 truncate">{product.name}</div>
       <div>${product.price}</div>
       <div>{product.stock ?? "-"}</div>
-      <div>{formatedDate ?? "-"}</div>
+      <div>{formatPublishedAt(product.publishedAt)}</div>
       <div
         className={twMerge(
           statusStyle,

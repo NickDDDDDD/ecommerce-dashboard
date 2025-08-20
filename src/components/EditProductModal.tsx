@@ -1,6 +1,7 @@
 import Modal from "./Modal";
 import { useState } from "react";
 import type { Product } from "../types/product";
+import { formatPublishedAt } from "../utils/date";
 
 type EditProductModalProps = {
   setModalOpen: (open: boolean) => void;
@@ -67,13 +68,7 @@ const EditProductModal = ({ setModalOpen, product }: EditProductModalProps) => {
           <input
             id="publishedAt"
             type="text"
-            value={new Date(productData.publishedAt).toLocaleString("zh-CN", {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+            value={formatPublishedAt(productData.publishedAt)}
             readOnly
             className="rounded-md border border-gray-300 bg-gray-100 p-2 text-gray-600"
           />

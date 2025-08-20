@@ -1,6 +1,7 @@
 // src/mocks/index.ts
 import Mock from "mockjs";
 import type { Product } from "../types/product";
+import type { ProductCreate } from "../types/productCreate";
 import type { ProductsResp } from "../types/productsResp";
 
 const list: Product[] = Mock.mock({
@@ -21,6 +22,7 @@ const list: Product[] = Mock.mock({
   ],
 }).list;
 
+// mock getProducts API
 Mock.mock(
   /\/api\/products(\?.*)?$/,
   "get",
@@ -47,5 +49,21 @@ Mock.mock(
     };
   },
 );
+
+Mock.mock("/api/products", "post", (options: { body: string }): Product => {
+  const payload = JSON.parse(options.body) as ProductCreate;
+
+  const newProduct: Product = {
+    id: Mock.Random.id(),
+    name: payload.name,
+    price: payload.price,
+    stock: payload.stock,
+    status: "draft",
+    publishedAt: null,
+  };
+
+  list.unshift(newProduct);
+  return newProduct;
+});
 
 Mock.setup({ timeout: "200-600" });
