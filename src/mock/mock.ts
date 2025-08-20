@@ -7,7 +7,7 @@ import type { ProductsResp } from "../types/productsResp";
 const list: Product[] = Mock.mock({
   "list|50": [
     {
-      id: "@id",
+      id: "@id(6,6)",
       name: "@ctitle(5, 10)",
       price: "@float(10, 2000, 2, 2)",
       stock: "@integer(0, 1000)",
@@ -23,6 +23,7 @@ const list: Product[] = Mock.mock({
 }).list;
 
 // GET /products/:params
+// GET /products?q=&page=&pageSize=&sortBy=price|stock&sortDir=asc|desc
 Mock.mock(
   /\/api\/products(\?.*)?$/,
   "get",
@@ -30,15 +31,38 @@ Mock.mock(
     const url = new URL(options.url, window.location.origin);
     const sp = url.searchParams;
 
+    // --- params ---
+    const q = (sp.get("q") || "").trim().toLowerCase();
+    const sortBy = (sp.get("sortBy") || "").trim(); // "price" | "stock" | ""
+    const sortDir = (sp.get("sortDir") || "asc").trim().toLowerCase(); // "asc" | "desc"
     const page = Math.max(1, Number(sp.get("page") || 1));
     const pageSize = Math.max(1, Number(sp.get("pageSize") || 10));
 
-    const total = list.length;
-    const totalPages = Math.ceil(total / pageSize);
-    const safePage = Math.min(page, totalPages);
+    // --- filter (fuzzy, multi-keyword AND) ---
+    const keywords = q ? q.split(/\s+/).filter(Boolean) : [];
+    const filtered = keywords.length
+      ? list.filter((p) => {
+          const name = (p.name || "").toLowerCase();
+          return keywords.every((kw) => name.includes(kw));
+        })
+      : list.slice(); // 浅拷贝以便后续 sort 不影响原数组
 
+    // --- sort ---
+    if (sortBy === "price" || sortBy === "stock") {
+      filtered.sort((a, b) => {
+        const x = a[sortBy] as number;
+        const y = b[sortBy] as number;
+        const cmp = x === y ? 0 : x < y ? -1 : 1;
+        return sortDir === "desc" ? -cmp : cmp;
+      });
+    }
+
+    // --- paginate ---
+    const total = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    const safePage = Math.min(page, totalPages);
     const start = (safePage - 1) * pageSize;
-    const items = list.slice(start, start + pageSize);
+    const items = filtered.slice(start, start + pageSize);
 
     return {
       items,

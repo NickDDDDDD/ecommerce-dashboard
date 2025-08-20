@@ -129,7 +129,8 @@ export default function ProductsPage() {
         {/* table header */}
         <div className="h-14 bg-gray-100">
           <div className="grid h-full grid-cols-6 items-center px-4 text-sm font-medium text-gray-700">
-            <div className="col-span-2">Name</div>
+            <div>ID</div>
+            <div>Name</div>
             <button
               onClick={() => onSort("price")}
               className="flex items-center gap-1 text-left hover:underline"
@@ -159,9 +160,9 @@ export default function ProductsPage() {
               Failed to load products.
             </div>
           ) : data?.items?.length ? (
-            <ul className="flex h-full flex-col divide-y divide-gray-200">
+            <ul className="grid h-full grid-rows-10 divide-y divide-gray-200">
               {data.items.map((product) => (
-                <li key={product.id} className="flex-1">
+                <li key={product.id}>
                   <ProductItem
                     product={product}
                     onUpdated={() => setRefresh((prev) => prev + 1)}

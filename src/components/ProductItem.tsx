@@ -20,7 +20,8 @@ const ProductItem = ({ product, onUpdated }: ProductItemProps) => {
 
   return (
     <div className="group relative grid h-full grid-cols-6 items-center px-4 py-2 hover:bg-gray-100">
-      <div className="col-span-2 truncate">{product.name}</div>
+      <div>{product.id}</div>
+      <div className="truncate">{product.name}</div>
       <div>${product.price}</div>
       <div>{product.stock ?? "-"}</div>
       <div>{formatPublishedAt(product.publishedAt)}</div>
