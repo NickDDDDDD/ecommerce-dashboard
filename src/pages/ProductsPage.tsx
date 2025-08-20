@@ -3,8 +3,8 @@ import { useSearchParams } from "react-router";
 import type { ProductsResp } from "../types/productsResp";
 import { listProducts } from "../api/products";
 import ProductItem from "../components/ProductItem";
+import ProductModal from "../components/AddProductModal";
 
-// 服务端/Mock 支持的字段（你可以在后端/Mock里按需实现）
 type SortField = "price" | "stock";
 type SortDir = "asc" | "desc";
 
@@ -13,22 +13,22 @@ const PageSize = 10;
 export default function ProductsPage() {
   const [params, setParams] = useSearchParams();
 
-  // 1) URL 参数源
+  // url params
   const q = params.get("q") ?? "";
   const page = Math.max(1, Number(params.get("page") ?? "1"));
   const sortBy = (params.get("sortBy") ?? "") as "" | SortField;
   const sortDir = (params.get("sortDir") ?? "asc") as SortDir;
 
-  // 2) 本地状态
+  // local state
   const [input, setInput] = useState(q);
   const [data, setData] = useState<ProductsResp | null>(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<unknown>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
-  // URL → 输入框同步
   useEffect(() => setInput(q), [q]);
 
-  // 3) 根据 URL 拉数（带竞态取消）
+  // get products response
   useEffect(() => {
     const ctrl = new AbortController();
     (async () => {
@@ -105,11 +105,15 @@ export default function ProductsPage() {
           className="flex-1 rounded-md border border-gray-300 px-2 py-1"
           aria-label="Search products"
         />
-        <button className="rounded-md bg-green-700 px-4 py-1 text-white">
+        <button
+          className="rounded-md bg-green-700 px-4 py-1 text-white"
+          onClick={() => setModalOpen(true)}
+        >
           Add product
         </button>
       </div>
 
+      {modalOpen && <ProductModal setModalOpen={setModalOpen} />}
       {/* table */}
       <div className="flex flex-1 flex-col overflow-hidden rounded-md border border-gray-300 shadow-2xs">
         {/* table header */}
